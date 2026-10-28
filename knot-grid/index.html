@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>최소 교대 그물 그림 구현</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>
+window.MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<style>
+/* Layout: one reading column; status ledger on top, then the plan, then notes. Grid-diagram X/O marks double as status markers. */
+:root {
+  --bg: #f5f7f9;
+  --surface: #ffffff;
+  --ink: #18222f;
+  --muted: #5b6878;
+  --line: #d9e0e7;
+  --accent: #1f5f8b;
+  --done: #2c7a4b;
+  --wait: #9a6a12;
+  --fail: #b23a3a;
+  --f-display: "Gowun Batang", "Noto Serif KR", serif;
+  --f-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d; --surface: #182029; --ink: #e3e9ef; --muted: #98a5b3; --line: #2a3542;
+    --accent: #7db4dc; --done: #6cc28f; --wait: #e0b25a; --fail: #ec8080; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161d; --surface: #182029; --ink: #e3e9ef; --muted: #98a5b3; --line: #2a3542;
+  --accent: #7db4dc; --done: #6cc28f; --wait: #e0b25a; --fail: #ec8080; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.7; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 40px; }
+header { display: flex; flex-direction: column; gap: 6px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
+h1 { font-family: var(--f-display); font-size: clamp(26px, 5vw, 36px); line-height: 1.25; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-size: 21px; margin: 0 0 12px; text-wrap: balance; }
+h3 { font-size: 15px; font-weight: 600; margin: 0; }
+p { margin: 0; }
+.meta { color: var(--muted); font-size: 13px; }
+.meta code, code { font-family: var(--f-mono); font-size: .9em; }
+.now { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px; }
+.now strong { font-size: 17px; }
+ol.stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+ol.stages li { display: grid; grid-template-columns: 28px 1fr auto; gap: 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+ol.stages li > div { min-width: 0; }
+.mk { font-family: var(--f-mono); font-weight: 500; font-size: 16px; text-align: center; }
+.mk.x { color: var(--done); }
+.mk.o { color: var(--muted); }
+.mk.cur { color: var(--accent); }
+.pill { font-family: var(--f-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.done { color: var(--done); } .pill.wait { color: var(--muted); } .pill.cur { color: var(--accent); }
+.sub { color: var(--muted); font-size: 13.5px; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 14px; }
+th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-weight: 600; color: var(--muted); font-size: 12.5px; }
+tfoot td { font-weight: 600; border-bottom: none; }
+td.pend { color: var(--muted); }
+.steps { display: grid; gap: 14px; }
+.step { display: grid; grid-template-columns: 40px 1fr; gap: 12px; }
+.step .n { font-family: var(--f-mono); color: var(--accent); font-size: 13px; padding-top: 2px; }
+.step > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.notes { display: grid; gap: 12px; }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.note .tag { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">R&amp;E 최종보고서 IV.3 · 구현 로그</span>
+    <h1>최소 교대 그물 그림 구현</h1>
+    <p class="meta">마지막 갱신 2026-10-28 21:10 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
+  </header>
+
+  <section class="now" aria-label="현재 상태">
+    <span class="eyebrow">지금</span>
+    <strong>논문 정독·데이터 확보·설계 완료 → 구현 착수 직전</strong>
+    <p class="sub">코드는 아직 한 줄도 안 돌렸어. 아래 설계와 손 계산 결과만 있는 상태.</p>
+  </section>
+
+  <section>
+    <h2>단계</h2>
+    <ol class="stages">
+      <li><span class="mk x">X</span><div><h3>논문 II~IV장 정독</h3><p class="sub">정의 1~4, 보조정리 5~14, 정리 13·15, 주정리, IV.3 절차</p></div><span class="pill done">완료</span></li>
+      <li><span class="mk x">X</span><div><h3>KnotInfo 데이터 확보</h3><p class="sub"><code>database_knotinfo 2026.10.5</code> (PD 코드, Jones 다항식 포함). 교대 매듭 6729개 확인</p></div><span class="pill done">완료</span></li>
+      <li><span class="mk x">X</span><div><h3>설계</h3><p class="sub">아래 "설계" 절. 그림 14의 8<sub>10</sub>은 손으로 따라가서 GEO 재현 확인</p></div><span class="pill done">완료</span></li>
+      <li><span class="mk cur">O</span><div><h3>모듈 구현</h3><p class="sub">PD → G, 테이트 그래프, 정리 13 귀납, 보조정리 12 삽입, 그물 그림 구성</p></div><span class="pill cur">다음</span></li>
+      <li><span class="mk o">O</span><div><h3>Jones 다항식 계산기 검증</h3><p class="sub">자체 Kauffman bracket을 먼저 KnotInfo PD 6729개에 돌려 KnotInfo 값과 대조</p></div><span class="pill wait">대기</span></li>
+      <li><span class="mk o">O</span><div><h3>작은 예 테스트</h3><p class="sub">3<sub>1</sub>, 4<sub>1</sub>, 6<sub>2</sub>, 8<sub>10</sub> (그림 14·16과 비교)</p></div><span class="pill wait">대기</span></li>
+      <li><span class="mk o">O</span><div><h3>전수 검증 6729개</h3><p class="sub">크기, 엇갈림 수, 교대성, Jones, $S^2$ 위 동위</p></div><span class="pill wait">대기</span></li>
+      <li><span class="mk o">O</span><div><h3>리포트·8<sub>10</sub> 그림·커밋/PR</h3><p class="sub">PNG/SVG, 실패 요약, 실행 스크립트</p></div><span class="pill wait">대기</span></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>검증 대상</h2>
+    <p class="sub" style="margin-bottom:10px">KnotInfo의 교대 매듭 수는 논문 IV.1의 6729개와 정확히 일치해.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>엇갈림 수 $c$</th><th>교대 매듭</th><th>통과</th><th>실패</th></tr></thead>
+        <tbody>
+          <tr><td>3</td><td>1</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>4</td><td>1</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>5</td><td>2</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>6</td><td>3</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>7</td><td>7</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>8</td><td>18</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>9</td><td>41</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>10</td><td>123</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>11</td><td>367</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>12</td><td>1288</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>13</td><td>4878</td><td class="pend">—</td><td class="pend">—</td></tr>
+        </tbody>
+        <tfoot><tr><td>합계</td><td>6729</td><td class="pend">—</td><td class="pend">—</td></tr></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>설계</h2>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div><h3>PD → $G$, $\vec G$, 면, $T$</h3>
+        <p>KnotInfo PD <code>[a,b,c,d]</code>는 들어오는 아래 가닥부터 반시계 순서라서 그대로 $G$의 회전계가 돼. 면은 "면을 왼쪽에 두고" 추적(도착한 변의 $\mathrm{Pred}$로 나감)하고, 경계의 모든 변이 $\vec G$ 방향인 면을 반시계 면으로 잡아. $T$의 $X$에서의 회전 = $R_X$ 경계를 방향대로 따라갈 때 만나는 엇갈림 순서. 여기서 연속한 $(v,u)$마다 $u\in\mathrm{Out}(v)$인지 assert하는 게 보조정리 6 검사야. 오일러 공식 $F=c+2$도 확인.</p></div></div>
+      <div class="step"><span class="n">2–3</span><div><h3>정리 13 귀납 (삭제·축약)</h3>
+        <p>회전계는 꼭짓점별 반시계 변 리스트. 삭제는 양 끝에서 $y$ 제거, 축약은 $M$의 회전 = $v$의 회전에서 $y$ 자리에 $u$의 회전($y$ 다음부터 $y$ 직전까지)을 끼움. $T-y$의 2-연결성은 직접 검사(절단점, 차수, 고리). 외부 라이브러리 없이 구현.</p>
+        <p class="sub">관찰: $X$는 축약에 끼지 않아서($y$가 $X$에 닿으면 $e_1$과 평행 → 보조정리 11(2)로 삭제) $\mathrm{Succ}_X(e_1)=e_n$이 끝까지 유지돼. 그래서 $X'$은 항상 "$e_1$의 다른 끝점"으로 유일하게 정해져.</p></div></div>
+      <div class="step"><span class="n">4</span><div><h3>보조정리 12 역삽입</h3>
+        <p>$A_1=\mathrm{Pred}_u(y)=e_1$, $A_2=\mathrm{Pred}_v(y)$, $B_1=\mathrm{Succ}_u(y)$, $B_2=\mathrm{Succ}_v(y)$, $r$ = 삭제면 $B_2$, 축약이면 $B_1$. $r$이 $A_2$ 뒤면 $B_1,B_2$ 중 나중 것 바로 앞, 앞이면 먼저 것 바로 뒤. 매 단계 스냅샷 그래프에 GEO 조건 assert.</p></div></div>
+      <div class="step"><span class="n">5</span><div><h3>GEO → GVO</h3>
+        <p>$v_k\leftrightarrow e_k$, 높이 = 순번. $|\mathrm{Out}(v_k)\cap\{v_1,\dots,v_{k-1}\}|=1$ 다시 assert.</p></div></div>
+      <div class="step"><span class="n">6</span><div><h3>그물 그림 (정리 15): 좌표 없이 조합적으로</h3>
+        <p>각 높이 $y=m$이 가로지르는 변은 $\delta(V_m)$이고, 보조정리 14(각 면은 꼭대기·바닥이 하나)에 의해 이 변들은 쌍대 그래프에서 바깥 면 $F=R_X$를 지나는 하나의 순환을 이뤄. 이 순환을 $F$에서 끊으면 $y=m$ 위의 왼쪽→오른쪽 순서가 나와. 이걸로 줄기 사이 좌우 관계를 모으고 위상정렬해서 열 순서를 정해. 순환이 생기면 정리 15 3단계 반례 후보로 기록.</p>
+        <p class="sub">BVL 좌표를 직접 만들지 않는 이유: 좌우 순서는 면 구조와 GVO만으로 정해지는 양이라 좌표 구성(기초정리 8)의 근사·수치 문제를 피할 수 있어. 대신 결과 그물 그림을 원래 $D$와 직접 비교해서 검증해.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>검증 방법</h2>
+    <ul class="plain">
+      <li>크기 $=c+2$, 그물 그림에서 센 엇갈림 수 $=c$, 각 엇갈림이 (행 $k$, 줄기 $v_k$의 열)인지</li>
+      <li>매듭을 따라가며 위·아래 교대성 확인</li>
+      <li>Jones 다항식: 그물 그림에서 PD를 다시 뽑아 자체 Kauffman bracket으로 계산, KnotInfo 값과 비교 (거울상이면 $t\to t^{-1}$로 어긋나서 잡혀)</li>
+      <li>추가로 그물 그림의 PD가 원래 $D$의 PD와 라벨 재배치만 다른지 확인 → $S^2$ 위에서 같은 그림인지까지 검사</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>메모</h2>
+    <div class="notes">
+      <div class="note"><span class="tag">손 계산 · 그림 14</span>
+        <p>그림 14의 $T_0$ 회전을 그림에서 읽어 정리 13을 손으로 끝까지 돌리면 축약 2 → 축약 4 → 삭제 7 → 축약 3 → 삭제 6 → 축약 5 순이고, 역삽입 결과가 $(1,3,5,6,8)\to(1,3,5,6,7,8)\to(1,3,4,5,6,7,8)\to(1,2,\dots,8)$로 그림의 GEO와 일치해.</p></div>
+      <div class="note"><span class="tag">관찰 · 보조정리 9</span>
+        <p>$\mathrm{Succ}_X(e_1)=e_n$이면 $v_1\to v_n$이 $R_X$ 경계의 변이야. 그래서 정리 15 2단계의 $e_s$는 바로 이 변이고, 다시 그린 왼쪽 새 열은 행 $0$부터 행 $n$까지 이어져.</p></div>
+      <div class="note"><span class="tag">주시할 곳</span>
+        <p>기초정리 8 증명의 "발이 3개인 경우"와 정리 15 3단계(좌우 관계에 순환 없음)는 전수 검증에서 실제로 깨지는지 따로 표시할 거야. 실패가 나오면 구현 버그인지 증명 빈틈인지 나눠서 최소 반례와 함께 여기 올릴게.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>환경</h2>
+    <p class="sub">Python 3.13. 핵심 알고리즘은 표준 라이브러리만 사용(networkx 불필요). 데이터는 <code>database_knotinfo</code>, PNG 저장에만 matplotlib, SVG는 직접 작성.</p>
+  </section>
+</div>
+</body>
+</html>
