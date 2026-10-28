@@ -65,6 +65,7 @@ th:first-child, td:first-child { text-align: left; }
 th { font-weight: 600; color: var(--muted); font-size: 12.5px; }
 tfoot td { font-weight: 600; border-bottom: none; }
 td.pend { color: var(--muted); }
+td.ok { color: var(--done); font-weight: 600; }
 .steps { display: grid; gap: 14px; }
 .step { display: grid; grid-template-columns: 40px 1fr; gap: 12px; }
 .step .n { font-family: var(--f-mono); color: var(--accent); font-size: 13px; padding-top: 2px; }
@@ -82,12 +83,12 @@ a { color: var(--accent); }
   <header>
     <span class="eyebrow">R&amp;E 최종보고서 IV.3 · 구현 로그</span>
     <h1>최소 교대 그물 그림 구현</h1>
-    <p class="meta">마지막 갱신 2026-10-28 22:05 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
+    <p class="meta">마지막 갱신 2026-10-28 21:28 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
   </header>
 
   <section class="now" aria-label="현재 상태">
     <span class="eyebrow">지금</span>
-    <strong>파이프라인 6단계 전부 구현 → 작은 예 전부 통과 → 6729개 전수 검증 시작</strong>
+    <strong>전수 검증 6729 / 6729 통과, 실패 0 ✓</strong>
     <p class="sub">3<sub>1</sub>, 4<sub>1</sub>, 6<sub>2</sub>, 8<sub>10</sub>, 13a<sub>4878</sub> 모두 크기 $c+2$, 엇갈림 $c$, 교대, Jones 일치, 원래 $D$와 $S^2$ 위에서 같은 그림까지 확인.</p>
   </section>
 
@@ -100,32 +101,32 @@ a { color: var(--accent); }
       <li><span class="mk x">X</span><div><h3>Jones 다항식 계산기 검증</h3><p class="sub">자체 Kauffman bracket을 KnotInfo PD 6729개에 돌림 → <b>6729/6729 일치</b>, 불일치 0, 거울상 혼동 0 (14초). KnotInfo PD가 반시계 규약이라는 것도 같이 확인됨</p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>모듈 구현</h3><p class="sub"><code>pd.py</code> · <code>diagram.py</code>(G, 면, T, 보조정리 6 assert) · <code>tait.py</code>(정리 13, 보조정리 12, 매 단계 GEO assert) · <code>grid.py</code>(GVO, 보조정리 7·14 검사, 높이별 좌우 순서, 위상정렬) · <code>verify.py</code> · <code>jones.py</code></p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>작은 예 테스트</h3><p class="sub">3<sub>1</sub>, 4<sub>1</sub>, 6<sub>2</sub>, 8<sub>10</sub>, 13a<sub>4878</sub> 전부 통과. 단 KnotInfo의 8<sub>10</sub> 그림은 테이트 그래프 꼭짓점이 4개라서 논문 그림 14(꼭짓점 6개)와 다른 그림(거울상 쪽)이야 → 그림 14 비교는 따로 함</p></div><span class="pill done">완료</span></li>
-      <li><span class="mk cur">O</span><div><h3>전수 검증 6729개</h3><p class="sub">크기, 엇갈림 수, 교대성, Jones, $S^2$ 위 동위</p></div><span class="pill cur">진행 중</span></li>
-      <li><span class="mk o">O</span><div><h3>8<sub>10</sub> 그림 14·16 비교</h3><p class="sub">그림 14의 $T_0$를 회전계까지 그대로 입력해서 GEO $(1,\dots,8)$ 재현 확인 + KnotInfo 그림과의 관계</p></div><span class="pill wait">대기</span></li>
+      <li><span class="mk x">X</span><div><h3>전수 검증 6729개</h3><p class="sub"><b>6729/6729 통과</b>. 중간 assert(보조정리 6·7·10·11·12·14, GEO·GVO 조건)도 하나도 안 깨짐. 코드는 <a href="https://github.com/sssejinmath209-bot/KSA/pull/5">PR #5</a></p></div><span class="pill done">완료</span></li>
+      <li><span class="mk cur">O</span><div><h3>8<sub>10</sub> 그림 14·16 비교</h3><p class="sub">그림 14의 $T_0$를 회전계까지 그대로 입력해서 GEO $(1,\dots,8)$ 재현 확인 + KnotInfo 그림과의 관계</p></div><span class="pill cur">다음</span></li>
       <li><span class="mk o">O</span><div><h3>리포트·8<sub>10</sub> 그림·커밋/PR</h3><p class="sub">PNG/SVG, 실패 요약, 실행 스크립트</p></div><span class="pill wait">대기</span></li>
     </ol>
   </section>
 
   <section>
     <h2>검증 대상</h2>
-    <p class="sub" style="margin-bottom:10px">KnotInfo의 교대 매듭 수는 논문 IV.1의 6729개와 정확히 일치해.</p>
+    <p class="sub" style="margin-bottom:10px">KnotInfo의 교대 매듭 수는 논문 IV.1의 6729개와 정확히 일치해. 매듭마다 극점 $(X,e_1)$ 하나로 실행, 4코어 병렬 6초. 통과 = 크기 $c+2$ · 엇갈림 $c$ · 교대 · Jones 일치(거울상 구분) · 원래 $D$와 $S^2$ 위 같은 그림, 다섯 개 모두 만족.</p>
     <div class="tbl">
       <table>
         <thead><tr><th>엇갈림 수 $c$</th><th>교대 매듭</th><th>통과</th><th>실패</th></tr></thead>
         <tbody>
-          <tr><td>3</td><td>1</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>4</td><td>1</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>5</td><td>2</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>6</td><td>3</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>7</td><td>7</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>8</td><td>18</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>9</td><td>41</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>10</td><td>123</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>11</td><td>367</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>12</td><td>1288</td><td class="pend">—</td><td class="pend">—</td></tr>
-          <tr><td>13</td><td>4878</td><td class="pend">—</td><td class="pend">—</td></tr>
+          <tr><td>3</td><td>1</td><td class="ok">1</td><td>0</td></tr>
+          <tr><td>4</td><td>1</td><td class="ok">1</td><td>0</td></tr>
+          <tr><td>5</td><td>2</td><td class="ok">2</td><td>0</td></tr>
+          <tr><td>6</td><td>3</td><td class="ok">3</td><td>0</td></tr>
+          <tr><td>7</td><td>7</td><td class="ok">7</td><td>0</td></tr>
+          <tr><td>8</td><td>18</td><td class="ok">18</td><td>0</td></tr>
+          <tr><td>9</td><td>41</td><td class="ok">41</td><td>0</td></tr>
+          <tr><td>10</td><td>123</td><td class="ok">123</td><td>0</td></tr>
+          <tr><td>11</td><td>367</td><td class="ok">367</td><td>0</td></tr>
+          <tr><td>12</td><td>1288</td><td class="ok">1288</td><td>0</td></tr>
+          <tr><td>13</td><td>4878</td><td class="ok">4878</td><td>0</td></tr>
         </tbody>
-        <tfoot><tr><td>합계</td><td>6729</td><td class="pend">—</td><td class="pend">—</td></tr></tfoot>
+        <tfoot><tr><td>합계</td><td>6729</td><td class="ok">6729</td><td>0</td></tr></tfoot>
       </table>
     </div>
   </section>
