@@ -87,7 +87,7 @@ a { color: var(--accent); }
   <header>
     <span class="eyebrow">R&amp;E 최종보고서 IV.3 · 구현 로그</span>
     <h1>최소 교대 그물 그림 구현</h1>
-    <p class="meta">마지막 갱신 2026-10-28 21:32 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
+    <p class="meta">마지막 갱신 2026-10-28 21:35 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
   </header>
 
   <section class="now" aria-label="현재 상태">
@@ -142,7 +142,7 @@ a { color: var(--accent); }
       <div class="note"><span class="tag">그림 14 · 정리 13</span>
         <p>그림 16(c)의 $T_0$(꼭짓점 $X_1,\dots,X_6$, 변 $e_1,\dots,e_8$)를 회전계까지 그대로 입력하고 $X=X_1$, 극점 $e_1, e_8$로 돌리면 축약 $e_2$ → 축약 $e_4$ → 삭제 $e_7$ → 축약 $e_3$ → 삭제 $e_6$ → 축약 $e_5$ 순서로 줄어들어. 역삽입 GEO는 $(1,8)\to(1,5,8)\to(1,5,6,8)\to(1,3,5,6,8)\to(1,3,5,6,7,8)\to(1,3,4,5,6,7,8)\to(1,2,\dots,8)$이고, 그림 14에 적힌 네 개와 전부 일치해.</p></div>
       <div class="note"><span class="tag">그림 16 · 거울상 주의</span>
-        <p>그림 16의 8<sub>10</sub>은 KnotInfo 8<sub>10</sub>의 <b>거울상</b>이야. KnotInfo PD를 평면 반사한 그림의 테이트 그래프가 $T_0$와 회전계까지 동형이고, 반사하지 않은 그림과는 동형이 아니야. 그 그림에 논문 극점을 쓰면 그물 그림이 그림 16(e)와 똑같이 나오고, Jones는 KnotInfo 값의 $t\to t^{-1}$와 일치해. 8<sub>10</sub>은 양손성 매듭이 아니라서 엄밀히는 다른 매듭이니까, 논문 그림 캡션에 "거울상"이라고 적거나 그림을 반사하는 게 좋겠어.</p></div>
+        <p>그림 16의 8<sub>10</sub>은 KnotInfo 8<sub>10</sub>의 <b>거울상</b>이야. KnotInfo PD를 평면 반사한 그림의 테이트 그래프가 $T_0$와 회전계까지 동형이고, 반사하지 않은 그림과는 동형이 아니야. 그 그림에 논문 극점을 쓰면 그물 그림이 그림 16(e)와 똑같이 나오고, Jones는 KnotInfo 값의 $t\to t^{-1}$와 일치해. 8<sub>10</sub>은 카이랄(KnotInfo 대칭형 reversible, Jones가 $t\leftrightarrow t^{-1}$ 대칭이 아님)이라서 엄밀히는 다른 매듭이니까, 논문 그림 캡션에 "거울상"이라고 적거나 그림을 반사하는 게 좋겠어.</p></div>
     </div>
     <div class="figs">
       <figure><img src="8_10_paper_fig16.png" alt="논문 극점으로 만든 8_10 거울상의 크기 10 그물 그림"><figcaption>구현 결과 (논문 그림, 논문 극점)</figcaption></figure>
@@ -186,6 +186,8 @@ a { color: var(--accent); }
         <p>그림 14의 $T_0$ 회전을 그림에서 읽어 정리 13을 손으로 끝까지 돌리면 축약 2 → 축약 4 → 삭제 7 → 축약 3 → 삭제 6 → 축약 5 순이고, 역삽입 결과가 $(1,3,5,6,8)\to(1,3,5,6,7,8)\to(1,3,4,5,6,7,8)\to(1,2,\dots,8)$로 그림의 GEO와 일치해.</p></div>
       <div class="note"><span class="tag">관찰 · 보조정리 9</span>
         <p>$\mathrm{Succ}_X(e_1)=e_n$이면 $v_1\to v_n$이 $R_X$ 경계의 변이야. 그래서 정리 15 2단계의 $e_s$는 바로 이 변이고, 다시 그린 왼쪽 새 열은 행 $0$부터 행 $n$까지 이어져.</p></div>
+      <div class="note"><span class="tag">서술 빈틈 · 정리 15 4단계</span>
+        <p>"3단계에서 좌우 순서를 보존하였으므로 대응하는 열 사이에도 다른 열이 없다"는 문장은 문자 그대로는 틀려. 84734개 행 중 51266개 행에서 두 끝 열 사이에 다른 열이 있어. 최소 예는 4<sub>1</sub>의 행 3이야: 끝 열 1, 4 사이에 열 3이 있고, 그 수직선분은 행 0~2만 차지해. 다만 그런 열의 수직선분은 한 번도 그 행을 지나지 않아(전수 확인). 그래서 결론 "수평선분은 $v_k$의 줄기만 지난다"는 맞아. 문장을 "행 $k$를 지나는 다른 수직선분은 두 끝 열 사이에 없다"로 고치고, 이유는 "높이 $k-\tfrac12$를 지나는 다른 줄기는 세 줄기 모두의 왼쪽이거나 모두의 오른쪽"으로 대면 돼.</p></div>
       <div class="note"><span class="tag">주시할 곳</span>
         <p>기초정리 8 증명의 "발이 3개인 경우"와 정리 15 3단계(좌우 관계에 순환 없음)는 전수 검증에서 실제로 깨지는지 따로 표시할 거야. 실패가 나오면 구현 버그인지 증명 빈틈인지 나눠서 최소 반례와 함께 여기 올릴게.</p></div>
     </div>
