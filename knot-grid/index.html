@@ -73,6 +73,10 @@ td.ok { color: var(--done); font-weight: 600; }
 .notes { display: grid; gap: 12px; }
 .note { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
 .note .tag { font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+.figs figure { margin: 0; background: #ffffff; border: 1px solid var(--line); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.figs img { width: 100%; height: auto; display: block; }
+.figs figcaption { font-size: 12.5px; color: #5b6878; text-align: center; }
 ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
 a { color: var(--accent); }
 </style>
@@ -83,13 +87,13 @@ a { color: var(--accent); }
   <header>
     <span class="eyebrow">R&amp;E 최종보고서 IV.3 · 구현 로그</span>
     <h1>최소 교대 그물 그림 구현</h1>
-    <p class="meta">마지막 갱신 2026-10-28 21:28 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
+    <p class="meta">마지막 갱신 2026-10-28 21:32 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
   </header>
 
   <section class="now" aria-label="현재 상태">
     <span class="eyebrow">지금</span>
-    <strong>전수 검증 6729 / 6729 통과, 실패 0 ✓</strong>
-    <p class="sub">3<sub>1</sub>, 4<sub>1</sub>, 6<sub>2</sub>, 8<sub>10</sub>, 13a<sub>4878</sub> 모두 크기 $c+2$, 엇갈림 $c$, 교대, Jones 일치, 원래 $D$와 $S^2$ 위에서 같은 그림까지 확인.</p>
+    <strong>6729 / 6729 통과 · 8<sub>10</sub>은 논문 그림 16(e)와 칸 단위로 일치 ✓</strong>
+    <p class="sub">지금은 매듭마다 가능한 모든 극점 $(X,e_1)$로 다시 돌리는 중(약 17만 회 실행). 끝나면 리포트 정리해서 커밋할게.</p>
   </section>
 
   <section>
@@ -102,8 +106,9 @@ a { color: var(--accent); }
       <li><span class="mk x">X</span><div><h3>모듈 구현</h3><p class="sub"><code>pd.py</code> · <code>diagram.py</code>(G, 면, T, 보조정리 6 assert) · <code>tait.py</code>(정리 13, 보조정리 12, 매 단계 GEO assert) · <code>grid.py</code>(GVO, 보조정리 7·14 검사, 높이별 좌우 순서, 위상정렬) · <code>verify.py</code> · <code>jones.py</code></p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>작은 예 테스트</h3><p class="sub">3<sub>1</sub>, 4<sub>1</sub>, 6<sub>2</sub>, 8<sub>10</sub>, 13a<sub>4878</sub> 전부 통과. 단 KnotInfo의 8<sub>10</sub> 그림은 테이트 그래프 꼭짓점이 4개라서 논문 그림 14(꼭짓점 6개)와 다른 그림(거울상 쪽)이야 → 그림 14 비교는 따로 함</p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>전수 검증 6729개</h3><p class="sub"><b>6729/6729 통과</b>. 중간 assert(보조정리 6·7·10·11·12·14, GEO·GVO 조건)도 하나도 안 깨짐. 코드는 <a href="https://github.com/sssejinmath209-bot/KSA/pull/5">PR #5</a></p></div><span class="pill done">완료</span></li>
-      <li><span class="mk cur">O</span><div><h3>8<sub>10</sub> 그림 14·16 비교</h3><p class="sub">그림 14의 $T_0$를 회전계까지 그대로 입력해서 GEO $(1,\dots,8)$ 재현 확인 + KnotInfo 그림과의 관계</p></div><span class="pill cur">다음</span></li>
-      <li><span class="mk o">O</span><div><h3>리포트·8<sub>10</sub> 그림·커밋/PR</h3><p class="sub">PNG/SVG, 실패 요약, 실행 스크립트</p></div><span class="pill wait">대기</span></li>
+      <li><span class="mk x">X</span><div><h3>8<sub>10</sub> 그림 14·16 비교</h3><p class="sub">그림 14의 $T_0$ → GEO $(1,\dots,8)$, 중간 GEO까지 일치. 그물 그림도 그림 16(e)와 수직·수평 선분 20개 전부 일치. 아래 "8<sub>10</sub>" 절 참고</p></div><span class="pill done">완료</span></li>
+      <li><span class="mk cur">O</span><div><h3>모든 극점 $(X,e_1)$ 전수 검증</h3><p class="sub">정리 13은 임의의 $e_1$에서 성립한다고 하니까, 매듭마다 $2c$가지 극점 선택을 전부 돌려서 확인</p></div><span class="pill cur">진행 중</span></li>
+      <li><span class="mk o">O</span><div><h3>리포트·커밋</h3><p class="sub">README 리포트, 테스트(<code>tests/test_small.py</code> 5개 통과), 실행 스크립트, PNG/SVG</p></div><span class="pill wait">대기</span></li>
     </ol>
   </section>
 
@@ -128,6 +133,21 @@ a { color: var(--accent); }
         </tbody>
         <tfoot><tr><td>합계</td><td>6729</td><td class="ok">6729</td><td>0</td></tr></tfoot>
       </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>8<sub>10</sub>: 논문 그림과 비교</h2>
+    <div class="notes">
+      <div class="note"><span class="tag">그림 14 · 정리 13</span>
+        <p>그림 16(c)의 $T_0$(꼭짓점 $X_1,\dots,X_6$, 변 $e_1,\dots,e_8$)를 회전계까지 그대로 입력하고 $X=X_1$, 극점 $e_1, e_8$로 돌리면 축약 $e_2$ → 축약 $e_4$ → 삭제 $e_7$ → 축약 $e_3$ → 삭제 $e_6$ → 축약 $e_5$ 순서로 줄어들어. 역삽입 GEO는 $(1,8)\to(1,5,8)\to(1,5,6,8)\to(1,3,5,6,8)\to(1,3,5,6,7,8)\to(1,3,4,5,6,7,8)\to(1,2,\dots,8)$이고, 그림 14에 적힌 네 개와 전부 일치해.</p></div>
+      <div class="note"><span class="tag">그림 16 · 거울상 주의</span>
+        <p>그림 16의 8<sub>10</sub>은 KnotInfo 8<sub>10</sub>의 <b>거울상</b>이야. KnotInfo PD를 평면 반사한 그림의 테이트 그래프가 $T_0$와 회전계까지 동형이고, 반사하지 않은 그림과는 동형이 아니야. 그 그림에 논문 극점을 쓰면 그물 그림이 그림 16(e)와 똑같이 나오고, Jones는 KnotInfo 값의 $t\to t^{-1}$와 일치해. 8<sub>10</sub>은 양손성 매듭이 아니라서 엄밀히는 다른 매듭이니까, 논문 그림 캡션에 "거울상"이라고 적거나 그림을 반사하는 게 좋겠어.</p></div>
+    </div>
+    <div class="figs">
+      <figure><img src="8_10_paper_fig16.png" alt="논문 극점으로 만든 8_10 거울상의 크기 10 그물 그림"><figcaption>구현 결과 (논문 그림, 논문 극점)</figcaption></figure>
+      <figure><img src="paper_fig16e.png" alt="논문 그림 16(e)"><figcaption>논문 그림 16(e)</figcaption></figure>
+      <figure><img src="8_10_knotinfo.png" alt="KnotInfo 8_10의 크기 10 그물 그림"><figcaption>KnotInfo 8<sub>10</sub> (기본 극점)</figcaption></figure>
     </div>
   </section>
 
