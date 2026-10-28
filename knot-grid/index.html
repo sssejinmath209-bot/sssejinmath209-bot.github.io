@@ -82,13 +82,13 @@ a { color: var(--accent); }
   <header>
     <span class="eyebrow">R&amp;E 최종보고서 IV.3 · 구현 로그</span>
     <h1>최소 교대 그물 그림 구현</h1>
-    <p class="meta">마지막 갱신 2026-10-28 21:10 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
+    <p class="meta">마지막 갱신 2026-10-28 21:40 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
   </header>
 
   <section class="now" aria-label="현재 상태">
     <span class="eyebrow">지금</span>
-    <strong>논문 정독·데이터 확보·설계 완료 → 구현 착수 직전</strong>
-    <p class="sub">코드는 아직 한 줄도 안 돌렸어. 아래 설계와 손 계산 결과만 있는 상태.</p>
+    <strong>Jones 계산기 검증 완료 → 알고리즘 모듈 구현 중</strong>
+    <p class="sub">자체 Kauffman bracket이 KnotInfo PD 6729개 전부에서 KnotInfo Jones 값과 정확히 일치(거울상 포함). 이제 PD → 테이트 그래프 → 정리 13 순서로 짜는 중.</p>
   </section>
 
   <section>
@@ -97,8 +97,8 @@ a { color: var(--accent); }
       <li><span class="mk x">X</span><div><h3>논문 II~IV장 정독</h3><p class="sub">정의 1~4, 보조정리 5~14, 정리 13·15, 주정리, IV.3 절차</p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>KnotInfo 데이터 확보</h3><p class="sub"><code>database_knotinfo 2026.10.5</code> (PD 코드, Jones 다항식 포함). 교대 매듭 6729개 확인</p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>설계</h3><p class="sub">아래 "설계" 절. 그림 14의 8<sub>10</sub>은 손으로 따라가서 GEO 재현 확인</p></div><span class="pill done">완료</span></li>
-      <li><span class="mk cur">O</span><div><h3>모듈 구현</h3><p class="sub">PD → G, 테이트 그래프, 정리 13 귀납, 보조정리 12 삽입, 그물 그림 구성</p></div><span class="pill cur">다음</span></li>
-      <li><span class="mk o">O</span><div><h3>Jones 다항식 계산기 검증</h3><p class="sub">자체 Kauffman bracket을 먼저 KnotInfo PD 6729개에 돌려 KnotInfo 값과 대조</p></div><span class="pill wait">대기</span></li>
+      <li><span class="mk x">X</span><div><h3>Jones 다항식 계산기 검증</h3><p class="sub">자체 Kauffman bracket을 KnotInfo PD 6729개에 돌림 → <b>6729/6729 일치</b>, 불일치 0, 거울상 혼동 0 (14초). KnotInfo PD가 반시계 규약이라는 것도 같이 확인됨</p></div><span class="pill done">완료</span></li>
+      <li><span class="mk cur">O</span><div><h3>모듈 구현</h3><p class="sub">PD → G, 테이트 그래프, 정리 13 귀납, 보조정리 12 삽입, 그물 그림 구성</p></div><span class="pill cur">진행 중</span></li>
       <li><span class="mk o">O</span><div><h3>작은 예 테스트</h3><p class="sub">3<sub>1</sub>, 4<sub>1</sub>, 6<sub>2</sub>, 8<sub>10</sub> (그림 14·16과 비교)</p></div><span class="pill wait">대기</span></li>
       <li><span class="mk o">O</span><div><h3>전수 검증 6729개</h3><p class="sub">크기, 엇갈림 수, 교대성, Jones, $S^2$ 위 동위</p></div><span class="pill wait">대기</span></li>
       <li><span class="mk o">O</span><div><h3>리포트·8<sub>10</sub> 그림·커밋/PR</h3><p class="sub">PNG/SVG, 실패 요약, 실행 스크립트</p></div><span class="pill wait">대기</span></li>
