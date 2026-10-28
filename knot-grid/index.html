@@ -87,13 +87,13 @@ a { color: var(--accent); }
   <header>
     <span class="eyebrow">R&amp;E 최종보고서 IV.3 · 구현 로그</span>
     <h1>최소 교대 그물 그림 구현</h1>
-    <p class="meta">마지막 갱신 2026-10-28 21:35 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
+    <p class="meta">마지막 갱신 2026-10-28 21:36 KST · 브랜치 <code>claude/alternating-knot-grid-diagram-81kxt0</code></p>
   </header>
 
   <section class="now" aria-label="현재 상태">
     <span class="eyebrow">지금</span>
-    <strong>6729 / 6729 통과 · 8<sub>10</sub>은 논문 그림 16(e)와 칸 단위로 일치 ✓</strong>
-    <p class="sub">지금은 매듭마다 가능한 모든 극점 $(X,e_1)$로 다시 돌리는 중(약 17만 회 실행). 끝나면 리포트 정리해서 커밋할게.</p>
+    <strong>구현 완료 · 6729 / 6729 통과 · 모든 극점 169,468회 통과 · 8<sub>10</sub>은 그림 16(e)와 일치 ✓</strong>
+    <p class="sub">정리의 반례(증명 빈틈 (b))는 하나도 없음. 정리 15 4단계에 서술 빈틈 하나(결론은 성립)와 그림 16이 거울상이라는 점을 찾았어. 코드·리포트는 <a href="https://github.com/sssejinmath209-bot/KSA/pull/5">PR #5</a>, 설명은 <code>knot_grid/README.md</code>.</p>
   </section>
 
   <section>
@@ -107,31 +107,31 @@ a { color: var(--accent); }
       <li><span class="mk x">X</span><div><h3>작은 예 테스트</h3><p class="sub">3<sub>1</sub>, 4<sub>1</sub>, 6<sub>2</sub>, 8<sub>10</sub>, 13a<sub>4878</sub> 전부 통과. 단 KnotInfo의 8<sub>10</sub> 그림은 테이트 그래프 꼭짓점이 4개라서 논문 그림 14(꼭짓점 6개)와 다른 그림(거울상 쪽)이야 → 그림 14 비교는 따로 함</p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>전수 검증 6729개</h3><p class="sub"><b>6729/6729 통과</b>. 중간 assert(보조정리 6·7·10·11·12·14, GEO·GVO 조건)도 하나도 안 깨짐. 코드는 <a href="https://github.com/sssejinmath209-bot/KSA/pull/5">PR #5</a></p></div><span class="pill done">완료</span></li>
       <li><span class="mk x">X</span><div><h3>8<sub>10</sub> 그림 14·16 비교</h3><p class="sub">그림 14의 $T_0$ → GEO $(1,\dots,8)$, 중간 GEO까지 일치. 그물 그림도 그림 16(e)와 수직·수평 선분 20개 전부 일치. 아래 "8<sub>10</sub>" 절 참고</p></div><span class="pill done">완료</span></li>
-      <li><span class="mk cur">O</span><div><h3>모든 극점 $(X,e_1)$ 전수 검증</h3><p class="sub">정리 13은 임의의 $e_1$에서 성립한다고 하니까, 매듭마다 $2c$가지 극점 선택을 전부 돌려서 확인</p></div><span class="pill cur">진행 중</span></li>
-      <li><span class="mk o">O</span><div><h3>리포트·커밋</h3><p class="sub">README 리포트, 테스트(<code>tests/test_small.py</code> 5개 통과), 실행 스크립트, PNG/SVG</p></div><span class="pill wait">대기</span></li>
+      <li><span class="mk x">X</span><div><h3>모든 극점 $(X,e_1)$ 전수 검증</h3><p class="sub">정리 13은 임의의 $e_1$에서 성립한다고 하니까 매듭마다 $2c$가지 극점을 전부 돌림 → <b>169,468 / 169,468 통과</b> (188초)</p></div><span class="pill done">완료</span></li>
+      <li><span class="mk x">X</span><div><h3>리포트·커밋</h3><p class="sub"><code>knot_grid/README.md</code> 리포트, <code>tests/test_small.py</code>(5개 통과), <code>run_all.py</code>, <code>make_figures.py</code>, 8<sub>10</sub> PNG/SVG/JSON. PR #5에 푸시 완료</p></div><span class="pill done">완료</span></li>
     </ol>
   </section>
 
   <section>
     <h2>검증 대상</h2>
-    <p class="sub" style="margin-bottom:10px">KnotInfo의 교대 매듭 수는 논문 IV.1의 6729개와 정확히 일치해. 매듭마다 극점 $(X,e_1)$ 하나로 실행, 4코어 병렬 6초. 통과 = 크기 $c+2$ · 엇갈림 $c$ · 교대 · Jones 일치(거울상 구분) · 원래 $D$와 $S^2$ 위 같은 그림, 다섯 개 모두 만족.</p>
+    <p class="sub" style="margin-bottom:10px">KnotInfo의 교대 매듭 수는 논문 IV.1의 6729개와 정확히 일치해. 극점 1개 실행은 4코어 6초, 모든 극점 실행은 188초. 통과 = 크기 $c+2$ · 엇갈림 $c$ · 교대 · Jones 일치(거울상 구분) · 원래 $D$와 $S^2$ 위 같은 그림, 다섯 개 모두 만족.</p>
     <div class="tbl">
       <table>
-        <thead><tr><th>엇갈림 수 $c$</th><th>교대 매듭</th><th>통과</th><th>실패</th></tr></thead>
+        <thead><tr><th>엇갈림 수 $c$</th><th>교대 매듭</th><th>통과 (극점 1개)</th><th>모든 극점 실행</th><th>통과</th><th>실패</th></tr></thead>
         <tbody>
-          <tr><td>3</td><td>1</td><td class="ok">1</td><td>0</td></tr>
-          <tr><td>4</td><td>1</td><td class="ok">1</td><td>0</td></tr>
-          <tr><td>5</td><td>2</td><td class="ok">2</td><td>0</td></tr>
-          <tr><td>6</td><td>3</td><td class="ok">3</td><td>0</td></tr>
-          <tr><td>7</td><td>7</td><td class="ok">7</td><td>0</td></tr>
-          <tr><td>8</td><td>18</td><td class="ok">18</td><td>0</td></tr>
-          <tr><td>9</td><td>41</td><td class="ok">41</td><td>0</td></tr>
-          <tr><td>10</td><td>123</td><td class="ok">123</td><td>0</td></tr>
-          <tr><td>11</td><td>367</td><td class="ok">367</td><td>0</td></tr>
-          <tr><td>12</td><td>1288</td><td class="ok">1288</td><td>0</td></tr>
-          <tr><td>13</td><td>4878</td><td class="ok">4878</td><td>0</td></tr>
+          <tr><td>3</td><td>1</td><td class="ok">1</td><td>6</td><td class="ok">6</td><td>0</td></tr>
+          <tr><td>4</td><td>1</td><td class="ok">1</td><td>8</td><td class="ok">8</td><td>0</td></tr>
+          <tr><td>5</td><td>2</td><td class="ok">2</td><td>20</td><td class="ok">20</td><td>0</td></tr>
+          <tr><td>6</td><td>3</td><td class="ok">3</td><td>36</td><td class="ok">36</td><td>0</td></tr>
+          <tr><td>7</td><td>7</td><td class="ok">7</td><td>98</td><td class="ok">98</td><td>0</td></tr>
+          <tr><td>8</td><td>18</td><td class="ok">18</td><td>288</td><td class="ok">288</td><td>0</td></tr>
+          <tr><td>9</td><td>41</td><td class="ok">41</td><td>738</td><td class="ok">738</td><td>0</td></tr>
+          <tr><td>10</td><td>123</td><td class="ok">123</td><td>2,460</td><td class="ok">2,460</td><td>0</td></tr>
+          <tr><td>11</td><td>367</td><td class="ok">367</td><td>8,074</td><td class="ok">8,074</td><td>0</td></tr>
+          <tr><td>12</td><td>1288</td><td class="ok">1288</td><td>30,912</td><td class="ok">30,912</td><td>0</td></tr>
+          <tr><td>13</td><td>4878</td><td class="ok">4878</td><td>126,828</td><td class="ok">126,828</td><td>0</td></tr>
         </tbody>
-        <tfoot><tr><td>합계</td><td>6729</td><td class="ok">6729</td><td>0</td></tr></tfoot>
+        <tfoot><tr><td>합계</td><td>6729</td><td class="ok">6729</td><td>169,468</td><td class="ok">169,468</td><td>0</td></tr></tfoot>
       </table>
     </div>
   </section>
